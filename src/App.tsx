@@ -1,61 +1,79 @@
-import { useState } from "react";
+import {useState} from "react";
 import "./App.css";
-import ReactMarkdown from "react-markdown";
+import { AudioClip } from "./types";
+import Drum from "./Drum";
 
-// defaultMarkdown contains valid markdown that represents at least one of each of the following elements: a header (H1 size), a sub header (H2 size), a link, inline code, a code block, a list item, a blockquote, an image, and bolded text
-const defaultMarkdown = `
-# Welcome to my React Markdown Previewer!
-
-## This is a sub-heading...
-### And here's some other cool stuff:
-
-Heres some code, \`<div></div>\`, between 2 backticks.
-
-\`\`\`
-// this is multi-line code:
-
-function anotherExample(firstLine, lastLine) {
-  if (firstLine == '\`\`\`' && lastLine == '\`\`\`') {
-    return multiLineCode;
-  }
-}
-\`\`\`
-
-You can also make text **bold**... whoa!
-Or _italic_.
-Or... **_both!_**
-
-There's also [links](https://www.freecodecamp.com), and
-> Block Quotes!
-
-![React Logo w/ Text](https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1200px-React-icon.svg.png)
-
-- And of course there are lists.
-  - Some are bulleted.
-      - With different indentation levels.
-        - That look like this.
-`;
+const audioClips: AudioClip[] = [
+  {
+    keyTrigger: "Q",
+    url: "https://s3.amazonaws.com/freecodecamp/drums/Heater-1.mp3",
+    description: "Heater 1",
+  },
+  {
+    keyTrigger: "W",
+    url: "https://s3.amazonaws.com/freecodecamp/drums/Heater-2.mp3",
+    description: "Heater 2",
+  },
+  {
+    keyTrigger: "E",
+    url: "https://s3.amazonaws.com/freecodecamp/drums/Heater-3.mp3",
+    description: "Heater 3",
+  },
+  {
+    keyTrigger: "A",
+    url: "https://s3.amazonaws.com/freecodecamp/drums/Heater-4_1.mp3",
+    description: "Heater 4",
+  },
+  {
+    keyTrigger: "S",
+    url: "https://s3.amazonaws.com/freecodecamp/drums/Heater-6.mp3",
+    description: "Clap",
+  },
+  {
+    keyTrigger: "D",
+    url: "https://s3.amazonaws.com/freecodecamp/drums/Dsc_Oh.mp3",
+    description: "Open HH",
+  },
+  {
+    keyTrigger: "Z",
+    url: "https://s3.amazonaws.com/freecodecamp/drums/Kick_n_Hat.mp3",
+    description: "Kick n' Hat",
+  },
+  {
+    keyTrigger: "X",
+    url: "https://s3.amazonaws.com/freecodecamp/drums/RP4_KICK_1.mp3",
+    description: "Kick",
+  },
+  {
+    keyTrigger: "C",
+    url: "https://s3.amazonaws.com/freecodecamp/drums/Cev_H2.mp3",
+    description: "Closed HH",
+  },
+];
 
 function App() {
-  const [markdownText, setMarkdownText] = useState<string>(defaultMarkdown);
+  const playAudio = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const clip = audioClips.find(
+      (clip) => clip.keyTrigger === e.key.toUpperCase()
+    );
+    if (!clip) return;
+    (document.getElementById(clip.keyTrigger) as HTMLAudioElement)
+      .play()
+      .catch(console.error);
 
+    document.getElementById("drum-" + clip.keyTrigger)?.focus();
+    document.getElementById("display")!.innerText = clip.description;
+  };
   return (
-    <>
-      <div>
-        <h1 style={{ textAlign: "center" }}>Markdown Previewer</h1>
-        <div className="boxes-container">
-          <textarea
-            name="editor"
-            id="editor"
-            value={markdownText}
-            onChange={(e) => setMarkdownText(e.target.value)}
-          ></textarea>
-          <div id="preview">
-            <ReactMarkdown>{markdownText}</ReactMarkdown>
-          </div>
-        </div>
+    <div className="container" id="drum-machine" onKeyDown={playAudio}>
+      <h1>Drum Machine</h1>
+      <div className="whole-drum">
+        {audioClips.map((clip) => (
+          <Drum audioClip={clip} key={clip.keyTrigger} />
+        ))}
       </div>
-    </>
+      <div id="display"></div>
+    </div>
   );
 }
 
